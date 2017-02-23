@@ -75,13 +75,13 @@ We will write everything we want to happen to each feature inside of the
 following (aptly named) function:
 
 var eachFeatureFunction = function(feature, layer) {
-  ...
+...
 });
 
 You'll notice that inside of that block of code we have a second block of code:
 
 layer.on('click', function (e) {
-  ...
+...
 })
 
 That part sets up a click event on each feature. Any code inside that second
@@ -123,11 +123,22 @@ of the application to report this information.
 
 ===================== */
 
-var dataset = "https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson"
+var dataset = "https://raw.githubusercontent.com/CPLN692-MUSA611/datasets/master/geojson/philadelphia-garbage-collection-boundaries.geojson";
 var featureGroup;
 
 var myStyle = function(feature) {
-  return {};
+  switch (feature.properties.COLLDAY){
+    case "MON":
+    return {fillColor: 'red'};
+    case "TUE":
+    return {fillColor: '#f7cac9'};
+    case "WED":
+    return {fillColor: '#deeaee'};
+    case "THU":
+    return {fillColor: '#b1cbbb'};
+    case "FRI":
+    return {fillColor: '#80ced6'};
+  }
 };
 
 var showResults = function() {
@@ -141,8 +152,29 @@ var showResults = function() {
   $('#intro').hide();
   // => <div id="results">
   $('#results').show();
+  $('.btn').show();
 };
+//
+// var closeResults = function() {
+//   $('#intro').show();
+//   $('#results').hide();
+//   $('.btn').hide();
+// };
 
+var showDay = function (day){
+  switch (day){
+    case "MON":
+    return "Monday";
+    case "TUE":
+    return  "Tuesday";
+    case "WED":
+    return "Wednesday";
+    case "THU":
+    return "Thursday";
+    case "FRI":
+    return "Friday";
+  }
+};
 
 var eachFeatureFunction = function(layer) {
   layer.on('click', function (event) {
@@ -151,16 +183,33 @@ var eachFeatureFunction = function(layer) {
     Check out layer.feature to see some useful data about the layer that
     you can use in your application.
     ===================== */
-    console.log(layer.feature);
+    map.fitBounds(layer.getBounds());
+
     showResults();
+    var day = layer.feature.properties.COLLDAY;
+    $(".day-of-week").text(showDay(day));
+    $(".layerID").remove();
+    $("#results").append("<p class='layerID'>LayerID: " + layer._leaflet_id + "</p>");
   });
 };
 
 var myFilter = function(feature) {
-  return true;
+  if (feature.properties.COLLDAY.length > 1) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
+$(".btn").click(function(){
+  $('#intro').show();
+  $('#results').hide();
+  $('.btn').hide();
+});
+
+
 $(document).ready(function() {
+  //????????
   $.ajax(dataset).done(function(data) {
     var parsedData = JSON.parse(data);
     featureGroup = L.geoJson(parsedData, {
@@ -170,5 +219,18 @@ $(document).ready(function() {
 
     // quite similar to _.each
     featureGroup.eachLayer(eachFeatureFunction);
+    // function to count times
+    var colList = [];
+    featureGroup.eachLayer(function(layer) {
+      colList.push(layer.feature.properties.COLLDAY);
+    });
+    var count = _.countBy(colList, function(day) {
+      return showDay(day);
+    });
+    var dayList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    $('#intro').append("<p class='count'><strong>Statistics:</strong></p>");
+    _.each(dayList, function(day) {
+      $('#intro').append("<p class='count'>" + day +": " + count[day]+ " areas</p>");// count.day can't work
+    });
   });
 });

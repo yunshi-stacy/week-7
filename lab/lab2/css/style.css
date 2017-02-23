@@ -28,7 +28,36 @@ p.main {
 }
 
 .legend {
-  position: absolute;
-  background-color: #fff;
-  z-index: 2000;
+    position: absolute;
+    background-color: #fff;
+    z-index: 2000;
+    left: 440px;
+    opacity: 0.7;
+    top: 9px;
+    font-size: small;
+    line-height: 1.5;
+    padding: 2px 7px 7px 7px;
+}
+
+.color {
+  display: inline-block;
+  width: 24px;
+  height: 12px;
+}
+
+.btn {
+    border: 1px solid transparent;
+    padding: .25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: .25rem;
+    transition: all .2s ease-in-out;
+    background-color: #d9534f;
+    color: #fff;
+    margin-left: 18rem;
+}
+
+
+.count {
+  margin: 0;
+  line-height: 1.2;
 }
